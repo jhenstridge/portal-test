@@ -19,9 +19,10 @@ apps:
     environment:
       GTK_USE_PORTAL: 1
     plugs:
+      - desktop
       - gsettings
+      - wayland
       - x11
-      - xdg-desktop-portal
     slots:
       - portal-test-dbus
 
@@ -29,20 +30,12 @@ parts:
   portal-test:
     after:
       - desktop-gtk3
-    plugin: nil
+    plugin: meson
     source: .
-    build: |
-      set -eux
-      mkdir build
-      meson --prefix=/ . build
-      cd build && ninja
-    install: |
-      set -eux
-      export DESTDIR="$SNAPCRAFT_PART_INSTALL"
-      cd build && ninja install
+    meson-parameters:
+      - --prefix=/
 
     build-packages:
-      - meson
       - gcc
       - libgstreamer-plugins-base1.0-dev
       - libgtk-3-dev
