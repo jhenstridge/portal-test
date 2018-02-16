@@ -7,6 +7,12 @@ description: |
 grade: devel
 confinement: strict
 
+plugs:
+  gnome-3-26-1604:
+    interface: content
+    target: $SNAP/gnome-platform
+    default-provider: gnome-3-26-1604:gnome-3-26-1604
+
 slots:
   portal-test-dbus:
     interface: dbus
@@ -21,15 +27,28 @@ apps:
     plugs:
       - desktop
       - gsettings
+      - network
       - wayland
       - x11
+      - gnome-3-26-1604
     slots:
       - portal-test-dbus
 
 parts:
+  gnome-3-26-ppa:
+    plugin: nil
+    prepare: |
+      set -ex
+      add-apt-repository -y ppa:ubuntu-desktop/gnome-3-26
+      apt-get update
+      apt-get dist-upgrade -y
+
   portal-test:
+    build-attributes:
+      - no-system-libraries
     after:
-      - desktop-gtk3
+      - gnome-3-26-ppa
+      - desktop-gnome-platform
     plugin: meson
     source: .
     meson-parameters:
